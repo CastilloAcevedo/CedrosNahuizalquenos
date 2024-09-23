@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using CedrosNahuizalquenos.Models;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.CodeAnalysis.Scripting;
 
 
 namespace CedrosNahuizalquenos.Controllers
@@ -96,6 +97,49 @@ namespace CedrosNahuizalquenos.Controllers
             }
             // Regex para validar el formato del código de seguridad
            
+        }
+
+        // POST: Usuarios/Login
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(string email, string password)
+        {
+
+
+            // Instancia de PasswordHasher para comparar contraseñas
+            var passwordHasher = new PasswordHasher<Usuario>();
+
+            // Buscar el usuario por el email
+            var userInDb = await _context.Usuarios
+                .FirstOrDefaultAsync(u => u.Email == email);
+
+            if (userInDb == null)
+            {
+                return Json(new { success = false, errors = "El correo electrónico es incorrecto." });
+            }
+
+            // Verificar la contraseña
+            var verificationResult = passwordHasher.VerifyHashedPassword(userInDb, userInDb.Contrasena, password);
+
+            if (verificationResult == PasswordVerificationResult.Failed)
+            {
+                return Json(new { success = false, errors = "La contraseña es incorrecta." });
+            }
+
+            // Si la autenticación es correcta, redirigir según el rol
+            if (userInDb.Rol == "Administrador")
+            {
+                return Json(new { success = true, rol="admin", name = userInDb.NombreCompleto });
+            }
+            else if (userInDb.Rol == "Cliente")
+            {
+                return Json(new { success = true, rol = "client", name = userInDb.NombreCompleto });
+            }
+
+            // Si el rol es diferente o no está configurado, redirigir a una página predeterminada
+            return RedirectToAction("Index", "Home");
         }
         // GET: Usuarios/Edit/5
         public async Task<IActionResult> Edit(int? id)
