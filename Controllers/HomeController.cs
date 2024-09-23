@@ -17,7 +17,13 @@ namespace CedrosNahuizalquenos.Controllers
         {
             return View();
         }
-
+        public IActionResult InicioAdmin() {
+            return View();
+        }
+        public IActionResult InicioClient()
+        {
+            return View();
+        }
         public IActionResult Privacy()
         {
             return View();
