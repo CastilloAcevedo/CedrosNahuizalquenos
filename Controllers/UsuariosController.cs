@@ -131,10 +131,13 @@ namespace CedrosNahuizalquenos.Controllers
             // Si la autenticación es correcta, redirigir según el rol
             if (userInDb.Rol == "Administrador")
             {
+                // Guardar el rol en la sesión
+                HttpContext.Session.SetString("UserRole", userInDb.Rol);
                 return Json(new { success = true, rol="admin", name = userInDb.NombreCompleto });
             }
             else if (userInDb.Rol == "Cliente")
             {
+                HttpContext.Session.SetString("UserRole", userInDb.Rol);
                 return Json(new { success = true, rol = "client", name = userInDb.NombreCompleto });
             }
 

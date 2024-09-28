@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@inject IHttpContextAccessor HttpContextAccessor
+@{
+    var userRole = HttpContextAccessor.HttpContext.Session.GetString("UserRole");
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -12,7 +16,17 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Regresar al login</a>
+                @{
+                    if (userRole == "Administrador")
+                    {
+                        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="InicioAdmin">Inicio</a>
+                    } else if (userRole == "Cliente")
+                    {
+                        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="InicioCliente">Inicio</a>
+                    }
+
+                }
+                
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -20,21 +34,35 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Catalogo</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Productoes" asp-action="Index">Catalogo</a>
                         </li>
                     </ul>
-
-                    <!-- Botón del carrito de compras -->
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <a class="nav-link position-relative" href="@Url.Action("Index", "Home")">
-                                <img src="/img/carrito.png" alt="Carrito" width="30">
-                                <span id="cartItemCount" class="position-absolute top-5 start-100 translate-middle badge rounded-pill bg-danger" style="display:none;">
-                                    0 <!-- Cantidad de productos en el carrito -->
-                                </span>
-                            </a>
-                        </li>
-                    </ul>
+                    @{
+                        
+                        if (userRole == "Administrador")
+                        {
+                            <ul class="navbar-nav ms-auto">
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-area="" asp-controller="Productoes" asp-action="Create">Agregar Producto</a>
+                                </li>
+                            </ul>
+                        }
+                    }
+                    @{                       
+                        if (userRole == "Cliente")
+                        {
+                            <ul class="navbar-nav ms-auto">
+                                <li class="nav-item">
+                                    <a class="nav-link position-relative" href="/Carrito">
+                                        <img src="/img/carrito.png" alt="Carrito" width="30">
+                                        <span id="cartItemCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display:none;">
+                                            0 <!-- Cantidad de productos en el carrito -->
+                                        </span>
+                                    </a>
+                                </li>
+                            </ul>
+                        }
+                    }
                 </div>
             </div>
         </nav>

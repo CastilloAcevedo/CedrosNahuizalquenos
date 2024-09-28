@@ -1,0 +1,106 @@
+﻿@model CedrosNahuizalquenos.Models.Producto
+
+@{
+    ViewData["Title"] = "Agregar Producto";
+}
+
+<h1>Actualizar catalogo de productos</h1>
+
+<h4>Complete el formulario</h4>
+<hr />
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <form id="createProductForm" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <div class="form-group">
+                <label asp-for="NombreProducto" class="control-label">Nombre</label>
+                <input asp-for="NombreProducto" class="form-control" placeholder="Ingrese el nombre del producto" />
+                <span asp-validation-for="NombreProducto" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Descripcion" class="control-label">Descripción</label>
+                <textarea asp-for="Descripcion" class="form-control" placeholder="Ingrese una descripción del producto"></textarea>
+                <span asp-validation-for="Descripcion" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PrecioBase" class="control-label">Precio ($)</label>
+                <input asp-for="PrecioBase" class="form-control" placeholder="Ingrese el precio" type="number" step="0.01" />
+                <span asp-validation-for="PrecioBase" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Imagen" class="control-label"> Imagen del producto: </label>
+                <input asp-for="Imagen" class="form-control" type="file" accept="image/*" />
+                <span asp-validation-for="Imagen" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EstadoProducto" class="control-label">Estado del producto</label>
+                <select asp-for="EstadoProducto" class="form-control">
+                    <option value="">Seleccione un estado</option>
+                    <option value="Disponible">Disponible</option>
+                    <option value="No Disponible">No Disponible</option>
+                </select>
+                <span asp-validation-for="EstadoProducto" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <br />
+                <input type="submit" value="Agregar Producto" class="btn btn-primary" />
+            </div>
+            <div class="form-group">
+                <br />
+                <a asp-controller="Home" asp-action="InicioAdmin" class="btn btn-secondary">Regresar a la lista</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function () {
+            $('#createProductForm').submit(function (event) {
+                event.preventDefault(); // Prevenir el envío del formulario
+
+                var formData = new FormData(this); // Crear un FormData para enviar datos
+
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("Create", "Productoes")', // Ajusta el nombre del controlador si es necesario
+                    data: formData,
+                    contentType: false, // Importante para enviar archivos
+                    processData: false, // Importante para enviar archivos
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Éxito',
+                                text: response.message,
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                window.location.href = '@Url.Action("InicioAdmin", "Home")'; // Redirigir a la pantalla de InicioAdmin
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message
+                            });
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Ocurrió un error al agregar el producto.'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}
