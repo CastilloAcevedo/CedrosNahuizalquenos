@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CedrosNahuizalquenos.Models;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace CedrosNahuizalquenos.Controllers
 {
@@ -20,7 +22,6 @@ namespace CedrosNahuizalquenos.Controllers
             _context = context;
             _memoryCache = memoryCache;
         }
-
         // GET: Productoes
         public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 6)
         {
@@ -67,15 +68,12 @@ namespace CedrosNahuizalquenos.Controllers
 
 
         // GET: Productoes/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var producto = await _context.Productos
-                .FirstOrDefaultAsync(m => m.ProductoId == id);
+                                .Include(p => p.Personalizaciones) // Incluimos personalizaciones
+                                .FirstOrDefaultAsync(p => p.ProductoId == id);
+
             if (producto == null)
             {
                 return NotFound();
@@ -124,56 +122,41 @@ namespace CedrosNahuizalquenos.Controllers
             return Json(new { success = false, message = $"Error: {message}" });
         }
 
-        // GET: Productoes/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var producto = await _context.Productos.FindAsync(id);
-            if (producto == null)
-            {
-                return NotFound();
-            }
-            return View(producto);
-        }
 
         // POST: Productoes/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ProductoId,NombreProducto,Descripcion,PrecioBase,Imagen,EstadoProducto")] Producto producto)
-        {
-            if (id != producto.ProductoId)
-            {
-                return NotFound();
-            }
+        //// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Edit(int id, [Bind("ProductoId,NombreProducto,Descripcion,PrecioBase,Imagen,EstadoProducto")] Producto producto)
+        //{
+        //    if (id != producto.ProductoId)
+        //    {
+        //        return NotFound();
+        //    }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(producto);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ProductoExists(producto.ProductoId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(producto);
-        }
+        //    if (ModelState.IsValid)
+        //    {
+        //        try
+        //        {
+        //            _context.Update(producto);
+        //            await _context.SaveChangesAsync();
+        //        }
+        //        catch (DbUpdateConcurrencyException)
+        //        {
+        //            if (!ProductoExists(producto.ProductoId))
+        //            {
+        //                return NotFound();
+        //            }
+        //            else
+        //            {
+        //                throw;
+        //            }
+        //        }
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    return View(producto);
+        //}
 
         // GET: Productoes/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -212,5 +195,46 @@ namespace CedrosNahuizalquenos.Controllers
         {
             return _context.Productos.Any(e => e.ProductoId == id);
         }
+        [HttpPost]
+        public async Task<IActionResult> AgregarAlCarrito([FromBody] PedidoDTO pedidoDto)
+        {
+            // Validar el producto y la personalización seleccionada
+            var producto = await _context.Productos.FindAsync(pedidoDto.ProductoID);
+            var personalizacion = await _context.Personalizaciones.FindAsync(pedidoDto.PersonalizacionID);
+
+            if (producto == null || personalizacion == null)
+            {
+                return Json(new { success = false, message = "Producto o personalización no encontrada." });
+            }
+
+            // Crear un nuevo pedido
+            var nuevoPedido = new Pedido
+            {
+                UsuarioId = pedidoDto.UsuarioID,
+                EstadoPedido = "En Carrito",
+                FechaPedido = DateTime.Now,
+                FechaEntregaEstimada = DateTime.Now.AddDays(7)
+            };
+            _context.Pedidos.Add(nuevoPedido);
+            await _context.SaveChangesAsync();
+
+            // Crear un detalle de pedido
+            var detallePedido = new DetallesPedido
+            {
+                PedidoId = nuevoPedido.PedidoId,
+                ProductoId = producto.ProductoId,
+                Cantidad = pedidoDto.Cantidad,
+                PrecioUnitario = producto.PrecioBase,
+                Subtotal = (producto.PrecioBase + personalizacion.CostosExtras) * pedidoDto.Cantidad,
+                PersonalizacionId = personalizacion.PersonalizacionId,
+                Anticipo = (producto.PrecioBase + personalizacion.CostosExtras) * pedidoDto.Cantidad * 0.5m // Ejemplo de anticipo
+            };
+            _context.DetallesPedidos.Add(detallePedido);
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "Producto agregado al carrito correctamente." });
+        }
+
+
     }
 }

@@ -16,7 +16,6 @@ namespace CedrosNahuizalquenos.Controllers
     public class UsuariosController : Controller
     {
         private readonly CedrosNahuiContext _context;
-
         public UsuariosController(CedrosNahuiContext context)
         {
             _context = context;
@@ -132,12 +131,16 @@ namespace CedrosNahuizalquenos.Controllers
             if (userInDb.Rol == "Administrador")
             {
                 // Guardar el rol en la sesión
+                HttpContext.Session.SetString("UsuarioName", userInDb.NombreCompleto);
                 HttpContext.Session.SetString("UserRole", userInDb.Rol);
+                HttpContext.Session.SetString("UserId", userInDb.UsuarioId.ToString());
                 return Json(new { success = true, rol="admin", name = userInDb.NombreCompleto });
             }
             else if (userInDb.Rol == "Cliente")
             {
+                HttpContext.Session.SetString("UsuarioName", userInDb.NombreCompleto);
                 HttpContext.Session.SetString("UserRole", userInDb.Rol);
+                HttpContext.Session.SetString("UserId", userInDb.UsuarioId.ToString());
                 return Json(new { success = true, rol = "client", name = userInDb.NombreCompleto });
             }
 
@@ -231,6 +234,13 @@ namespace CedrosNahuizalquenos.Controllers
         private bool UsuarioExists(int id)
         {
             return _context.Usuarios.Any(e => e.UsuarioId == id);
+        }
+        // Esta acción redirige al login
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult RedirectToLogin()
+        {
+            return RedirectToAction("Index", "Home"); // Redirige a la acción de login
         }
     }
 }
