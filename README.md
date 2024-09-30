@@ -2,7 +2,7 @@
 Desarrollo de un sistema web para Cedros Nahuizalqueños, enfocado en mejorar la visualización de catálogos de productos, la gestión de pedidos, y los pagos por transferencia bancaria, resolviendo la falta de automatización actual.
 Tecnologías:
 
-    Backend: .NET Core (Última Versión), C#, Entity Framework Core.
+    Backend: .NET 8, C#, Entity Framework Core.
     Frontend: Blazor WebAssembly.
     IDE: Visual Studio 2022.
     Base de Datos: SQL Server.
