@@ -9,12 +9,7 @@
 
 }
 
-<h1 class="text-center my-4">Productos</h1>
-
-<p class="text-right">
-    <a asp-action="Create" class="btn btn-success">Agregar Nuevo Producto</a>
-</p>
-
+<h1 class="text-center my-4">Catalogo</h1>
 <div class="row">
     @foreach (var item in Model)
     {
@@ -37,7 +32,7 @@
                         }
                     </div>
                     <p class="card-text"><strong>Estado:</strong> @item.EstadoProducto</p>
-                    <a asp-action="Details" asp-route-id="@item.ProductoId" class="btn btn-info">Detalles</a>
+                    <a asp-action="Edit" asp-route-id="@item.ProductoId" class="btn btn-info">Encargar Producto</a>
                 </div>
             </div>
             <hr />

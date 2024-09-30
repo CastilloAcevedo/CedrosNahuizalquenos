@@ -1,54 +1,158 @@
 ﻿@model CedrosNahuizalquenos.Models.Producto
-
+@inject IHttpContextAccessor HttpContextAccessor
 @{
-    ViewData["Title"] = "Edit";
+    var UserId = HttpContextAccessor.HttpContext.Session.GetString("UserId");
+    int cartCount = 0;
 }
 
-<h1>Edit</h1>
+<div class="container">
+    <h2>@Model.NombreProducto</h2>
+    <p>@Model.Descripcion</p>
+    <p><strong>Precio Base: $@Model.PrecioBase</strong></p>
 
-<h4>Producto</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="ProductoId" />
-            <div class="form-group">
-                <label asp-for="NombreProducto" class="control-label"></label>
-                <input asp-for="NombreProducto" class="form-control" />
-                <span asp-validation-for="NombreProducto" class="text-danger"></span>
+    <div class="text-center">
+        <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Imagen)" alt="@Model.NombreProducto" class="img-fluid" style="max-width: 300px;">
+    </div>
+
+    <hr />
+
+    <h4>Personalización</h4>
+    <form id="formPersonalizacion">
+        <input type="hidden" id="usuarioId" value="@UserId" />
+        <input type="hidden" id="productoId" value="@Model.ProductoId" />
+
+        <!-- Tamaño -->
+        <div class="form-group">
+            <label for="tamano">Tamaño:</label>
+            <select id="tamano" class="form-control">
+                <option value="4 personas" data-extra="0">4 personas (1.60m x 1.80m) - Sin costo extra</option>
+                <option value="6 personas" data-extra="100">6 personas (1.80m x 2.10m) - +$100</option>
+                <option value="8 personas" data-extra="200">8 personas (2m x 2.5m) - +$200</option>
+            </select>
+        </div>
+
+        <!-- Tipo -->
+        <div class="form-group">
+            <label for="tipo">Tipo:</label>
+            <select id="tipo" class="form-control">
+                <option value="Redonda">Redonda</option>
+                <option value="Rectangular">Rectangular</option>
+            </select>
+        </div>
+
+        <!-- Tono de Madera -->
+        <div class="form-group">
+            <label for="tono">Tono de Madera:</label>
+            <select id="tono" class="form-control">
+                <option value="Maderoso" data-extra="0">Maderoso - Sin costo extra</option>
+                <option value="Blanco" data-extra="100">Blanco - +$100</option>
+                <option value="Nogal" data-extra="0">Nogal - Sin costo extra</option>
+            </select>
+        </div>
+
+        <!-- Cantidad -->
+        <div class="form-group mt-3">
+            <label for="cantidad">Cantidad:</label>
+            <input type="number" id="cantidad" name="cantidad" value="1" class="form-control" min="1" required />
+        </div>
+
+        <button type="button" class="btn btn-primary mt-3" id="btnVerPedido" data-toggle="modal" data-target="#pedidoModal">Ver Pedido</button>
+        <button type="button" class="btn btn-success mt-3" id="agregarCarrito" onclick="updateCartCount(@cartCount)">Agregar al Carrito</button>
+    </form>
+
+    <!-- Modal para ver pedido -->
+    <div class="modal fade" id="pedidoModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detalle del Pedido</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>Producto: @Model.NombreProducto</p>
+                    <p id="selectedTamano"><span></span></p>       
+                    <p id="selectedCantidad"><span></span></p>
+                    <p id="total"><span></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Descripcion" class="control-label"></label>
-                <input asp-for="Descripcion" class="form-control" />
-                <span asp-validation-for="Descripcion" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PrecioBase" class="control-label"></label>
-                <input asp-for="PrecioBase" class="form-control" />
-                <span asp-validation-for="PrecioBase" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Imagen" class="control-label"></label>
-                <input asp-for="Imagen" class="form-control" />
-                <span asp-validation-for="Imagen" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="EstadoProducto" class="control-label"></label>
-                <input asp-for="EstadoProducto" class="form-control" />
-                <span asp-validation-for="EstadoProducto" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function () {
+            $('#btnVerPedido').click(function () {
+                // Captura el tamaño seleccionado
+                var tamañoText = $('#tamano option:selected').text();
+                var tamañoCostoExtra = (tamañoText.includes("6 personas") ? 100 : 0 || tamañoText.includes("8 personas") ? 200 : 0);
+
+                // Captura el tipo (redonda o rectangular) - No impacta el costo, solo se muestra
+                var tipoText = $('#tipo option:selected').text();
+
+                // Captura el tono de madera y calcula costo extra
+                var tonoText = $('#tono option:selected').text();
+                var tonoCostoExtra = (tonoText.includes("Blanco")) ? 100 : 0;
+
+                // Captura la cantidad
+                var cantidad = $('#cantidad').val();
+
+                // Precio base del producto
+                var precioBase = @Model.PrecioBase;
+
+                // Costo total
+                var total = (precioBase + tamañoCostoExtra + tonoCostoExtra) * cantidad;
+
+                // Muestra los datos en el modal
+                $('#selectedTamano').text("Adicionales: "  + tamañoText + ", " + tipoText + ", " + tonoText);
+                $('#selectedCantidad').text("Cantidad: " + cantidad);
+                $('#total').text("Total: $" + total.toFixed(2));
+            });
+        });
+
+
+        //Envío del formulario con AJAX y manejo de respuesta con SweetAlert
+        $('#agregarCarrito').click(function () {
+            var pedido = {
+                UsuarioID: $('#usuarioId').val(),
+                ProductoID: $('#productoId').val(),
+                OpcionPersonalizada: 'Tamaño: ' + $('#tamano option:selected').text() + ', Tipo: ' + $('#tipo option:selected').val() + ', Tono de Madera: ' + $('#tono option:selected').text(),
+                Cantidad: $('#cantidad').val()
+            };
+
+            $.ajax({
+                url: 'Url.Action("AgregarAlCarrito", "Carrito")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(pedido),
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            title: 'Producto agregado',
+                            text: "¿Qué quieres hacer a continuación?",
+                            icon: 'success',
+                            showCancelButton: true,
+                            confirmButtonText: 'Ir al Carrito',
+                            cancelButtonText: 'Seguir Comprando',
+                            reverseButtons: true
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = 'Url.Action("Carrito", "Carrito")';
+                            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                window.location.href = 'Url.Action("Index", "Catalogo")';
+                            }
+                        });
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire('Error', 'Ocurrió un problema al agregar el producto al carrito. Por favor, inténtalo de nuevo.', 'error');
+                }
+            });
+        });
+    </script>
 }
+

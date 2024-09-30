@@ -20,9 +20,10 @@
                     if (userRole == "Administrador")
                     {
                         <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="InicioAdmin">Inicio</a>
-                    } else if (userRole == "Cliente")
+                    }
+                    else if (userRole == "Cliente")
                     {
-                        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="InicioCliente">Inicio</a>
+                        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="InicioClient">Inicio</a>
                     }
 
                 }
@@ -63,6 +64,13 @@
                             </ul>
                         }
                     }
+                    <ul class="navbar-nav ms-auto ms-2">
+                        <form asp-controller="Usuarios" asp-action="RedirectToLogin" method="post" style="display:inline;">
+                            <button type="submit" style="border: none; background: none; padding: 0; cursor: pointer;">
+                                <img src="~/img/cerrar-sesion.png" alt="Cerrar Sesión" style="width: 24px; height: 24px;" />
+                            </button>
+                        </form>
+                    </ul>
                 </div>
             </div>
         </nav>
@@ -83,6 +91,11 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <!-- Referencia al archivo cart.js -->
     <script src="~/js/Admin.js"></script>
+    <!-- Popper.js -->
+    <!-- Popper.js desde CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js" integrity="sha512-nnzkI2u2Dy6HMnzMIkh7CPd1KX445z38XIu4jG1jGw7x5tSL3VBjE44dY4ihMU1ijAQV930SPM12cCFrB18sVw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
