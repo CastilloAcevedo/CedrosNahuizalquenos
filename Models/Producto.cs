@@ -13,7 +13,7 @@ public partial class Producto
 
     public decimal PrecioBase { get; set; }
 
-    public byte[] Imagen { get; set; } = null!;
+    public byte[]? Imagen { get; set; } // Cambia a tipo nullable
 
     public string EstadoProducto { get; set; } = null!;
 

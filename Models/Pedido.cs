@@ -23,3 +23,11 @@ public partial class Pedido
 
     public virtual Usuario Usuario { get; set; } = null!;
 }
+public class PedidoDTO
+{
+    public int UsuarioID { get; set; }
+    public int ProductoID { get; set; }
+    public int PersonalizacionID { get; set; }
+    public int Cantidad { get; set; }
+}
+

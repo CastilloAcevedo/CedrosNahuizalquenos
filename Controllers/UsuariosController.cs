@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using CedrosNahuizalquenos.Models;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.CodeAnalysis.Scripting;
 
 
 namespace CedrosNahuizalquenos.Controllers
@@ -15,7 +16,6 @@ namespace CedrosNahuizalquenos.Controllers
     public class UsuariosController : Controller
     {
         private readonly CedrosNahuiContext _context;
-
         public UsuariosController(CedrosNahuiContext context)
         {
             _context = context;
@@ -96,6 +96,56 @@ namespace CedrosNahuizalquenos.Controllers
             }
             // Regex para validar el formato del código de seguridad
            
+        }
+
+        // POST: Usuarios/Login
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(string email, string password)
+        {
+
+
+            // Instancia de PasswordHasher para comparar contraseñas
+            var passwordHasher = new PasswordHasher<Usuario>();
+
+            // Buscar el usuario por el email
+            var userInDb = await _context.Usuarios
+                .FirstOrDefaultAsync(u => u.Email == email);
+
+            if (userInDb == null)
+            {
+                return Json(new { success = false, errors = "El correo electrónico es incorrecto." });
+            }
+
+            // Verificar la contraseña
+            var verificationResult = passwordHasher.VerifyHashedPassword(userInDb, userInDb.Contrasena, password);
+
+            if (verificationResult == PasswordVerificationResult.Failed)
+            {
+                return Json(new { success = false, errors = "La contraseña es incorrecta." });
+            }
+
+            // Si la autenticación es correcta, redirigir según el rol
+            if (userInDb.Rol == "Administrador")
+            {
+                // Guardar el rol en la sesión
+                HttpContext.Session.SetString("UsuarioName", userInDb.NombreCompleto);
+                HttpContext.Session.SetString("UserRole", userInDb.Rol);
+                HttpContext.Session.SetString("UserId", userInDb.UsuarioId.ToString());
+                return Json(new { success = true, rol="admin", name = userInDb.NombreCompleto });
+            }
+            else if (userInDb.Rol == "Cliente")
+            {
+                HttpContext.Session.SetString("UsuarioName", userInDb.NombreCompleto);
+                HttpContext.Session.SetString("UserRole", userInDb.Rol);
+                HttpContext.Session.SetString("UserId", userInDb.UsuarioId.ToString());
+                return Json(new { success = true, rol = "client", name = userInDb.NombreCompleto });
+            }
+
+            // Si el rol es diferente o no está configurado, redirigir a una página predeterminada
+            return RedirectToAction("Index", "Home");
         }
         // GET: Usuarios/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -184,6 +234,13 @@ namespace CedrosNahuizalquenos.Controllers
         private bool UsuarioExists(int id)
         {
             return _context.Usuarios.Any(e => e.UsuarioId == id);
+        }
+        // Esta acción redirige al login
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult RedirectToLogin()
+        {
+            return RedirectToAction("Index", "Home"); // Redirige a la acción de login
         }
     }
 }

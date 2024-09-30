@@ -1,0 +1,13 @@
+﻿@inject IHttpContextAccessor HttpContextAccessor
+@{
+    var UserName = HttpContextAccessor.HttpContext.Session.GetString("UsuarioName");
+    var UserRol = HttpContextAccessor.HttpContext.Session.GetString("UserRole");
+}
+<h1>Bievenido: @UserName</h1>
+
+<p>Pagina para el rol: @UserRol</p>
+
+<div class="text-center">
+    <img src="~/img/Logo.jpg" class="img-fluid" style="width: 50%; height: auto;">
+</div>
+

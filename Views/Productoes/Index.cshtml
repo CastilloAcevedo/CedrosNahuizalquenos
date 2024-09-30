@@ -1,0 +1,71 @@
+﻿@model IEnumerable<CedrosNahuizalquenos.Models.Producto>
+
+@{
+    ViewData["Title"] = "Index";
+    int totalCount = ViewBag.TotalCount;
+    int pageSize = ViewBag.PageSize;
+    int pageNumber = ViewBag.PageNumber;
+    int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+}
+
+<h1 class="text-center my-4">Catalogo</h1>
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">@item.NombreProducto</h5>
+                    <p class="card-text">@item.Descripcion</p>
+                    <p class="card-text"><strong>Precio:</strong> $@item.PrecioBase</p>
+                    <div>
+                        @if (item.Imagen != null)
+                        {
+                            var base64Image = Convert.ToBase64String(item.Imagen);
+                            var imgSrc = $"data:image/jpg;base64,{base64Image}"; // Asumiendo que la imagen es JPG
+                            <img src="@imgSrc" alt="Imagen de @item.NombreProducto" style="width:100%; height:auto;" loading="lazy" class="img-fluid" />
+                        }
+                        else
+                        {
+                            <span>No Image</span>
+                        }
+                    </div>
+                    <p class="card-text"><strong>Estado:</strong> @item.EstadoProducto</p>
+                    <a asp-action="Edit" asp-route-id="@item.ProductoId" class="btn btn-info">Encargar Producto</a>
+                </div>
+            </div>
+            <hr />
+        </div>
+    }
+</div>
+
+<!-- Paginación -->
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        @if (pageNumber > 1)
+        {
+            <li class="page-item">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@(pageNumber - 1)" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+        }
+
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            <li class="page-item @(i == pageNumber ? "active" : "")">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@i">@i</a>
+            </li>
+        }
+
+        @if (pageNumber < totalPages)
+        {
+            <li class="page-item">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@(pageNumber + 1)" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        }
+    </ul>
+</nav>

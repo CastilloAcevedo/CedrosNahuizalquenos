@@ -1,0 +1,47 @@
+﻿@model IEnumerable<CedrosNahuizalquenos.Models.Inventario>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.CantidadStock)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FechaActualizacion)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Producto)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.CantidadStock)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FechaActualizacion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Producto.ProductoId)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.InventarioId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.InventarioId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.InventarioId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
