@@ -6,9 +6,9 @@
 }
 
 <div class="container">
-    <h2>@Model.NombreProducto</h2>
-    <p>@Model.Descripcion</p>
-    <p><strong>Precio Base: $@Model.PrecioBase</strong></p>
+    <h2 class="fw-semibold text-decoration-underline">@Model.NombreProducto</h2>
+    <p class="ms-3 fst-italic">@Model.Descripcion</p>
+    <p class="ms-3 fst-italic"><strong>Precio Base: $@Model.PrecioBase</strong></p>
 
     <div class="text-center">
         <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Imagen)" alt="@Model.NombreProducto" class="img-fluid" style="max-width: 300px;">
@@ -16,13 +16,13 @@
 
     <hr />
 
-    <h4>Personalización</h4>
-    <form id="formPersonalizacion">
+    <h4 class="fw-semibold text-decoration-underline">Personalización</h4>
+    <form id="formPersonalizacion m-5">
         <input type="hidden" id="usuarioId" value="@UserId" />
         <input type="hidden" id="productoId" value="@Model.ProductoId" />
 
         <!-- Tamaño -->
-        <div class="form-group">
+        <div class="form-group m-3">
             <label for="tamano">Tamaño:</label>
             <select id="tamano" class="form-control">
                 <option value="4 personas" data-extra="0">4 personas (1.60m x 1.80m) - Sin costo extra</option>
@@ -32,7 +32,7 @@
         </div>
 
         <!-- Tipo -->
-        <div class="form-group">
+        <div class="form-group m-3">
             <label for="tipo">Tipo:</label>
             <select id="tipo" class="form-control">
                 <option value="Redonda">Redonda</option>
@@ -41,7 +41,7 @@
         </div>
 
         <!-- Tono de Madera -->
-        <div class="form-group">
+        <div class="form-group m-3">
             <label for="tono">Tono de Madera:</label>
             <select id="tono" class="form-control">
                 <option value="Maderoso" data-extra="0">Maderoso - Sin costo extra</option>
@@ -51,13 +51,13 @@
         </div>
 
         <!-- Cantidad -->
-        <div class="form-group mt-3">
+        <div class="form-group m-3">
             <label for="cantidad">Cantidad:</label>
             <input type="number" id="cantidad" name="cantidad" value="1" class="form-control" min="1" required />
         </div>
 
-        <button type="button" class="btn btn-primary mt-3" id="btnVerPedido" data-toggle="modal" data-target="#pedidoModal">Ver Pedido</button>
-        <button type="button" class="btn btn-success mt-3" id="agregarCarrito" onclick="updateCartCount(@cartCount)">Agregar al Carrito</button>
+        <button type="button" class="text-white btn btn-warning mt-3 styleBotonsSecondary" id="btnVerPedido" data-toggle="modal" data-target="#pedidoModal">Ver Pedido</button>
+        <button type="button" class="text-white btn btn-success mt-3 styleBotonsNav" id="agregarCarrito" onclick="updateCartCount(@cartCount)">Agregar al Carrito</button>
     </form>
 
     <!-- Modal para ver pedido -->
@@ -65,8 +65,8 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Detalle del Pedido</h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h5 class="modal-title fw-semibold">Detalle del Pedido</h5>
+                    <button type="button" class="close styleBotonsNav" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
                     <p>Producto: @Model.NombreProducto</p>
@@ -75,7 +75,7 @@
                     <p id="total"><span></span></p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="text-white btn btn-warning styleBotonsSecondary" data-dismiss="modal">Cerrar</button>
                 </div>
             </div>
         </div>

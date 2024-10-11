@@ -20,3 +20,74 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+/*Efectos hover para botones del nav*/
+.styleBotonsNav {
+    transition: all 0.4s ease; /* Animación suave para los cambios */
+    cursor: pointer;
+}
+
+.styleBotonsNav:hover {
+    height: 100%;
+    background-color: #45a049; /* Fondo verde más oscuro */
+    font-size: 18px; /* Aumenta ligeramente el tamaño del texto */
+    text-shadow: 2px 2px 5px #000000; /* Añade una sombra */
+    border-radius: 5px;
+}
+
+.styleBotonsNav:active {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5); /* Añade sombra al hacer clic */
+    background-color: #16351d; /* Cambia el fondo a verde más oscuro */
+}
+
+/*Botones generales*/
+.styleBotonsSecondary {
+    transition: all 0.4s ease; /* Animación suave para los cambios */
+    cursor: pointer;
+}
+
+.styleBotonsSecondary:hover{
+    height: 100%;
+    background-color: #ffe65d; /* Fondo amarillo más claro */
+    font-size: 18px; /* Aumenta ligeramente el tamaño del texto */
+    text-shadow: 2px 2px 5px #000000; /* Añade una sombra */
+    border-radius: 5px;
+}
+
+.styleBotonsSecondary:active {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5); /* Añade sombra al hacer clic */
+    background-color: #b8a314; /* Cambia el fondo a verde más oscuro */
+}
+
+/*Carrusel*/
+/* Establecer una altura fija para el carrusel */
+#carouselExampleInterval {
+    width: 100%;
+    height: 600px; /* Ajusta esta altura según tus necesidades */
+}
+
+/* Asegurar que las imágenes ocupen toda la altura sin deformarse */
+#carouselExampleInterval .carousel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Las imágenes cubrirán todo el contenedor sin perder proporción */
+}
+
+/*Establecemos las cards de informacion*/
+.card-img-top {
+    height: 200px; /* Ajusta la altura según tus necesidades */
+    object-fit: cover; /* Asegura que la imagen cubra el espacio sin deformarse */
+}
+
+
+/*Establecemos querys*/
+@media (max-width: 768px){
+    /* Estilos específicos para pantallas menores de 750px */
+    #carouselExampleInterval {
+        height: 600px; /* Ajusta la altura según tus necesidades */
+    }
+
+    #carouselExampleInterval .carousel-item img {
+       object-fit: cover; /* Mantiene la proporción de las imágenes */
+    }
+}

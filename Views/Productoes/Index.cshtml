@@ -9,14 +9,14 @@
 
 }
 
-<h1 class="text-center my-4">Catalogo</h1>
+<h1 class="text-center my-4 fs-1 fw-bold text-uppercase text-decoration-underline">Catálogo</h1>
 <div class="row">
     @foreach (var item in Model)
     {
         <div class="col-md-4 mb-4">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">@item.NombreProducto</h5>
+                    <h5 class="card-title fw-bold text-center">@item.NombreProducto</h5>
                     <p class="card-text">@item.Descripcion</p>
                     <p class="card-text"><strong>Precio:</strong> $@item.PrecioBase</p>
                     <div>
@@ -31,8 +31,8 @@
                             <span>No Image</span>
                         }
                     </div>
-                    <p class="card-text"><strong>Estado:</strong> @item.EstadoProducto</p>
-                    <a asp-action="Edit" asp-route-id="@item.ProductoId" class="btn btn-info">Encargar Producto</a>
+                    <p class="card-text mt-3"><strong>Estado:</strong> @item.EstadoProducto</p>
+                    <a asp-action="Edit" asp-route-id="@item.ProductoId" class="btn btn-success text-center d-flex justify-content-center styleBotonsNav">Encargar Producto</a>
                 </div>
             </div>
             <hr />
@@ -62,7 +62,7 @@
         @if (pageNumber < totalPages)
         {
             <li class="page-item">
-                <a class="page-link" asp-action="Index" asp-route-pageNumber="@(pageNumber + 1)" aria-label="Next">
+                <a class="page-link " asp-action="Index" asp-route-pageNumber="@(pageNumber + 1)" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </li>

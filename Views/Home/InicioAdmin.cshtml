@@ -3,11 +3,66 @@
     var UserName = HttpContextAccessor.HttpContext.Session.GetString("UsuarioName");
     var UserRol = HttpContextAccessor.HttpContext.Session.GetString("UserRole");
 }
-<h1>Bievenido: @UserName</h1>
+<h1 class="fs-1 fw-bold text-center text-uppercase text-decoration-underline">Bievenido: @UserName</h1>
 
-<p>Pagina para el rol: @UserRol</p>
+<p class="fst-italic text-center">Página asignada para el rol de: @UserRol</p>
 
-<div class="text-center">
-    <img src="~/img/Logo.jpg" class="img-fluid" style="width: 50%; height: auto;">
+<!-- Añadimos carrusel -->
+<div id="carouselExampleInterval" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner h-100">
+        <div class="carousel-item">
+            <img src="~/img/anchologo.jpg" class="d-block w-100" alt="...">
+        </div>
+        <div class="carousel-item active" data-bs-interval="10000">
+            <img src="~/img/1.jpg" class="d-block w-100" alt="...">
+        </div>
+        <div class="carousel-item" data-bs-interval="2000">
+            <img src="~/img/2.jpg" class="d-block w-100" alt="...">
+        </div>
+        <div class="carousel-item">
+            <img src="~/img/3.jpg" class="d-block w-100" alt="...">
+        </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
 </div>
 
+<!-- Añadimos un sobre nosotros -->
+
+<h1 class="fs-1 fw-bold text-center text-uppercase text-decoration-underline mt-3">Información</h1>
+
+<div class="row row-cols-1 row-cols-md-3 g-4 mt-3">
+    <div class="col">
+        <div class="card h-100">
+            <img src="~/img/13.jpg" class="card-img-top" alt="...">
+            <div class="card-body">
+                <h5 class="card-title fw-bold text-center text-decoration-underline">¿Quienes somos?</h5>
+                <p class="card-text">Cedros Nahuizalqueños es un emprendimiento dedicado a la creación y venta de muebles personalizados, donde la calidad y el diseño se fusionan para ofrecer productos únicos a nuestros clientes. Nuestra misión es proporcionar muebles que no solo se adapten a las necesidades y gustos de cada hogar, sino que también reflejen la personalidad de quienes los habitan. Trabajamos con materiales seleccionados cuidadosamente para garantizar durabilidad y estilo, creando piezas que se convierten en el centro de atención en cualquier espacio.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100">
+            <img src="~/img/12.jpg" class="card-img-top" alt="...">
+            <div class="card-body">
+                <h5 class="card-title fw-bold text-center text-decoration-underline">Productos</h5>
+                <p class="card-text">En Cedros Nahuizalqueños, ofrecemos una amplia gama de muebles personalizados que se adaptan a todos los espacios de tu hogar y oficina. Cada mueble que fabricamos es el resultado de un proceso creativo y colaborativo, donde escuchamos atentamente las ideas y deseos de nuestros clientes.  </p>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100">
+            <img src="~/img/14.jpg" class="card-img-top" alt="...">
+            <div class="card-body">
+                <h5 class="card-title fw-bold text-center text-decoration-underline">¿Cómo adquirir un producto?</h5>
+                <p class="card-text">Adquiere nuestros productos visitando nuestro catálogo, donde podrás seleccionar el estilo y las personalizaciones que desees. Una vez que hayas hecho tu elección, te redirigiremos al proceso de pago mediante un depósito. Después de realizar el depósito, envíanos el comprobante para que podamos finalizar el contacto contigo.</p>
+            </div>
+        </div>
+    </div>
+</div>

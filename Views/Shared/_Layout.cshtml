@@ -14,16 +14,16 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-success text-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 @{
                     if (userRole == "Administrador")
                     {
-                        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="InicioAdmin">Inicio</a>
+                        <a class="nav-link text-white text-uppercase fw-bold styleBotonsNav" asp-area="" asp-controller="Home" asp-action="InicioAdmin">Inicio</a>
                     }
                     else if (userRole == "Cliente")
                     {
-                        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="InicioClient">Inicio</a>
+                        <a class="nav-link text-white text-uppercase fw-bold styleBotonsNav" asp-area="" asp-controller="Home" asp-action="InicioClient">Inicio</a>
                     }
 
                 }
@@ -35,7 +35,7 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Productoes" asp-action="Index">Catalogo</a>
+                            <a class="nav-link text-white text-uppercase fw-bold styleBotonsNav " asp-area="" asp-controller="Productoes" asp-action="Index">Catálogo</a>
                         </li>
                     </ul>
                     @{
@@ -44,7 +44,7 @@
                         {
                             <ul class="navbar-nav ms-auto">
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-area="" asp-controller="Productoes" asp-action="Create">Agregar Producto</a>
+                                    <a class="nav-link text-white text-uppercase fw-bold fw-boldd styleBotonsNav" asp-area="" asp-controller="Productoes" asp-action="Create">Agregar Producto</a>
                                 </li>
                             </ul>
                         }
@@ -55,7 +55,7 @@
                             <ul class="navbar-nav ms-auto">
                                 <li class="nav-item">
                                     <a class="nav-link position-relative" href="/Carrito">
-                                        <img src="/img/carrito.png" alt="Carrito" width="30">
+                                        <img src="/img/anadir-al-carrito.png" alt="Carrito" width="30">
                                         <span id="cartItemCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display:none;">
                                             0 <!-- Cantidad de productos en el carrito -->
                                         </span>
@@ -64,10 +64,10 @@
                             </ul>
                         }
                     }
-                    <ul class="navbar-nav ms-auto ms-2">
+                    <ul class="navbar-nav ms-auto ms-5">
                         <form asp-controller="Usuarios" asp-action="RedirectToLogin" method="post" style="display:inline;">
-                            <button type="submit" style="border: none; background: none; padding: 0; cursor: pointer;">
-                                <img src="~/img/cerrar-sesion.png" alt="Cerrar Sesión" style="width: 24px; height: 24px;" />
+                            <button class="nav-link position-relative" type="submit" style="border: none; background: none; padding: 0; cursor: pointer;">
+                                <img src="~/img/login-out.png" alt="Cerrar Sesión" style="width: 24px; height: 24px;" />
                             </button>
                         </form>
                     </ul>

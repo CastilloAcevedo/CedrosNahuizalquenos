@@ -15,13 +15,15 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h2 class="text-center">Ya casi estas listo para visitar Cedros Nahuizalqueños</h2>
-        <h4 class="text-center">Complete el formulario para registrar un nuevo usuario</h4>
+        <h3 class="text-center text-uppercase fw-bold fs-1 mb-4">Crear Usuario</h3>
+      
         <hr />
         <div class="row justify-content-center">
             <div class="col-md-6">
                 <form asp-action="Create" method="post">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <p class="fst-italic text-center ">Completa el formulario para registrar un nuevo usuario y acceder a la página.</p>
 
                     <div class="form-group mb-3">
                         <label asp-for="NombreCompleto" class="control-label">Nombre Completo</label>
@@ -69,7 +71,7 @@
                     </div>
 
                     <div class="form-group mb-3 text-center">
-                        <input type="submit" value="Crear Usuario" class="btn btn-primary btn-lg" />
+                        <input type="submit" value="Crear Usuario" class="btn btn-success styleBotonsNav btn-lg" />
                     </div>
                 </form>
             </div>
