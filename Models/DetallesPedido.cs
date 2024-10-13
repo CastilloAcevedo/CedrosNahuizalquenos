@@ -27,3 +27,8 @@ public partial class DetallesPedido
 
     public virtual Producto Producto { get; set; } = null!;
 }
+
+public class elimDTO
+{
+    public int detalle { get; set; }
+}

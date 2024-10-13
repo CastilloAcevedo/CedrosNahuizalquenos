@@ -1,5 +1,6 @@
 ﻿@inject IHttpContextAccessor HttpContextAccessor
 @{
+    var UserId = HttpContextAccessor.HttpContext.Session.GetString("UserId");
     var userRole = HttpContextAccessor.HttpContext.Session.GetString("UserRole");
 }
 <!DOCTYPE html>
@@ -11,6 +12,12 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/CedrosNahuizalquenos.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+
+
+
 </head>
 <body>
     <header>
@@ -54,7 +61,7 @@
                         {
                             <ul class="navbar-nav ms-auto">
                                 <li class="nav-item">
-                                    <a class="nav-link position-relative" href="/Carrito">
+                                    <a class="nav-link position-relative" href="@Url.Action("Carrito", "DetallesPedidoes", new { usuarioId = UserId })">
                                         <img src="/img/anadir-al-carrito.png" alt="Carrito" width="30">
                                         <span id="cartItemCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display:none;">
                                             0 <!-- Cantidad de productos en el carrito -->
@@ -96,6 +103,35 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js" integrity="sha512-nnzkI2u2Dy6HMnzMIkh7CPd1KX445z38XIu4jG1jGw7x5tSL3VBjE44dY4ihMU1ijAQV930SPM12cCFrB18sVw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- Bootstrap JS -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function () {
+            // Función para obtener la cantidad de pedidos desde el servidor
+            function obtenerCantidadPedidos() {
+                $.ajax({
+                    url: '@Url.Action("ObtenerCantidadCarrito", "Usuarios")', // Cambia "TuControlador" por el nombre de tu controlador
+                    type: 'GET',
+                    data: { usuarioId: @UserId }, // Envía el ID del usuario autenticado
+                    success: function (data) {
+                        if (data.success) {
+                            updateCartCount(data.count); // Actualiza el contador con la nueva cantidad
+                        } else {
+                            console.error("Error al obtener la cantidad de pedidos: " + data.message);
+                        }
+                    },
+                    error: function () {
+                        console.error("Error al realizar la petición al servidor.");
+                    }
+                });
+            }
+
+            // Llama a la función para obtener la cantidad de pedidos al cargar la página
+            obtenerCantidadPedidos();
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

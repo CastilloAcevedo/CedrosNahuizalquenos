@@ -2,9 +2,7 @@
 @inject IHttpContextAccessor HttpContextAccessor
 @{
     var UserId = HttpContextAccessor.HttpContext.Session.GetString("UserId");
-    int cartCount = 0;
 }
-
 <div class="container">
     <h2 class="fw-semibold text-decoration-underline">@Model.NombreProducto</h2>
     <p class="ms-3 fst-italic">@Model.Descripcion</p>
@@ -57,7 +55,7 @@
         </div>
 
         <button type="button" class="text-white btn btn-warning mt-3 styleBotonsSecondary" id="btnVerPedido" data-toggle="modal" data-target="#pedidoModal">Ver Pedido</button>
-        <button type="button" class="text-white btn btn-success mt-3 styleBotonsNav" id="agregarCarrito" onclick="updateCartCount(@cartCount)">Agregar al Carrito</button>
+        <button type="button" class="text-white btn btn-success mt-3 styleBotonsNav" id="agregarCarrito" onclick="agregarAlCarrito()">Agregar al Carrito</button>
     </form>
 
     <!-- Modal para ver pedido -->
@@ -114,45 +112,57 @@
 
 
         //Envío del formulario con AJAX y manejo de respuesta con SweetAlert
-        $('#agregarCarrito').click(function () {
+        function agregarAlCarrito() {
             var pedido = {
-                UsuarioID: $('#usuarioId').val(),
-                ProductoID: $('#productoId').val(),
-                OpcionPersonalizada: 'Tamaño: ' + $('#tamano option:selected').text() + ', Tipo: ' + $('#tipo option:selected').val() + ', Tono de Madera: ' + $('#tono option:selected').text(),
-                Cantidad: $('#cantidad').val()
+                UsuarioID: @UserId,  // ID del usuario autenticado
+                ProductoID: '@Model.ProductoId',          // ID del producto actual
+                Tamano: $('#tamano option:selected').text(),
+                Tipo: $('#tipo option:selected').text(),
+                TonoMadera: $('#tono option:selected').text(),
+                Cantidad: document.getElementById('cantidad').value
             };
 
             $.ajax({
-                url: 'Url.Action("AgregarAlCarrito", "Carrito")',
+                url: '@Url.Action("AgregarAlCarrito", "Productoes")',  // Acción en el controlador
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(pedido),
                 success: function (response) {
                     if (response.success) {
+                        // SweetAlert con botones de opciones
                         Swal.fire({
-                            title: 'Producto agregado',
-                            text: "¿Qué quieres hacer a continuación?",
+                            title: 'Producto agregado al carrito',
+                            text: "¿Deseas seguir comprando o ir al carrito?",
                             icon: 'success',
                             showCancelButton: true,
                             confirmButtonText: 'Ir al Carrito',
-                            cancelButtonText: 'Seguir Comprando',
-                            reverseButtons: true
+                            cancelButtonText: 'Seguir Comprando'
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                window.location.href = 'Url.Action("Carrito", "Carrito")';
+                                // Si elige "Ir al Carrito"
+                                window.location.href = '@Url.Action("Carrito", "DetallesPedidoes")' + '?usuarioId=' + pedido.UsuarioID
                             } else if (result.dismiss === Swal.DismissReason.cancel) {
-                                window.location.href = 'Url.Action("Index", "Catalogo")';
+                                // Si elige "Seguir Comprando"
+                                window.location.href = '@Url.Action("Index", "Productoes")';
                             }
                         });
                     } else {
-                        Swal.fire('Error', response.message, 'error');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message
+                        });
                     }
                 },
-                error: function (xhr, status, error) {
-                    Swal.fire('Error', 'Ocurrió un problema al agregar el producto al carrito. Por favor, inténtalo de nuevo.', 'error');
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error al agregar el producto al carrito.'
+                    });
                 }
             });
-        });
+        }
     </script>
 }
 

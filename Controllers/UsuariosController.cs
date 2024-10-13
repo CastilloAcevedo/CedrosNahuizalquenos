@@ -141,7 +141,7 @@ namespace CedrosNahuizalquenos.Controllers
                 HttpContext.Session.SetString("UsuarioName", userInDb.NombreCompleto);
                 HttpContext.Session.SetString("UserRole", userInDb.Rol);
                 HttpContext.Session.SetString("UserId", userInDb.UsuarioId.ToString());
-                return Json(new { success = true, rol = "client", name = userInDb.NombreCompleto });
+                return Json(new { success = true, rol = "client", name = userInDb.NombreCompleto});
             }
 
             // Si el rol es diferente o no está configurado, redirigir a una página predeterminada
@@ -241,6 +241,15 @@ namespace CedrosNahuizalquenos.Controllers
         public IActionResult RedirectToLogin()
         {
             return RedirectToAction("Index", "Home"); // Redirige a la acción de login
+        }
+        [HttpGet]
+        public IActionResult ObtenerCantidadCarrito(int usuarioId)
+        {
+            // Obtiene la cantidad de pedidos para el usuario especificado
+            var cantidad = _context.Pedidos.Count(p => p.UsuarioId == usuarioId);
+
+            // Devuelve la cantidad y un indicador de éxito
+            return Json(new { success = true, count = cantidad });
         }
     }
 }

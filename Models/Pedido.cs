@@ -27,7 +27,9 @@ public class PedidoDTO
 {
     public int UsuarioID { get; set; }
     public int ProductoID { get; set; }
-    public int PersonalizacionID { get; set; }
-    public int Cantidad { get; set; }
+    public string Tamano { get; set; } // Tamaño seleccionado
+    public string Tipo { get; set; } // Tipo seleccionado (Redonda o Rectangular)
+    public string TonoMadera { get; set; } // Tono de madera seleccionado
+    public int Cantidad { get; set; } // Cantidad de productos
 }
 

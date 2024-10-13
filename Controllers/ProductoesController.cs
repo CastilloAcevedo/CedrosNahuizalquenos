@@ -122,42 +122,6 @@ namespace CedrosNahuizalquenos.Controllers
             return Json(new { success = false, message = $"Error: {message}" });
         }
 
-
-        // POST: Productoes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        //// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Edit(int id, [Bind("ProductoId,NombreProducto,Descripcion,PrecioBase,Imagen,EstadoProducto")] Producto producto)
-        //{
-        //    if (id != producto.ProductoId)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    if (ModelState.IsValid)
-        //    {
-        //        try
-        //        {
-        //            _context.Update(producto);
-        //            await _context.SaveChangesAsync();
-        //        }
-        //        catch (DbUpdateConcurrencyException)
-        //        {
-        //            if (!ProductoExists(producto.ProductoId))
-        //            {
-        //                return NotFound();
-        //            }
-        //            else
-        //            {
-        //                throw;
-        //            }
-        //        }
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    return View(producto);
-        //}
-
         // GET: Productoes/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -198,42 +162,58 @@ namespace CedrosNahuizalquenos.Controllers
         [HttpPost]
         public async Task<IActionResult> AgregarAlCarrito([FromBody] PedidoDTO pedidoDto)
         {
-            // Validar el producto y la personalización seleccionada
+            // Validar el producto
             var producto = await _context.Productos.FindAsync(pedidoDto.ProductoID);
-            var personalizacion = await _context.Personalizaciones.FindAsync(pedidoDto.PersonalizacionID);
-
-            if (producto == null || personalizacion == null)
+            if (producto == null)
             {
-                return Json(new { success = false, message = "Producto o personalización no encontrada." });
+                return Json(new { success = false, message = "Producto no encontrado." });
             }
+            var opcionesPersonalizacion = $"Tamaño: {pedidoDto.Tamano}, Tipo: {pedidoDto.Tipo}, Tono de Madera: {pedidoDto.TonoMadera}";
+            // Calcular los costos adicionales basados en las opciones seleccionadas
+
+            decimal costoExtraTamano = pedidoDto.Tamano.Contains("6 personas") ? 100 : pedidoDto.Tamano.Contains("8 personas") ? 200 : 0;
+            decimal costoExtraTono = pedidoDto.TonoMadera.Contains("Blanco") ? 100 : 0;
+
+            // Calcular el total del pedido
+            decimal totalCosto = (producto.PrecioBase + costoExtraTamano + costoExtraTono) * pedidoDto.Cantidad;
+
+            // Crear una nueva entrada en la tabla de personalizaciones
+            var nuevaPersonalizacion = new Personalizacione
+            {
+                ProductoId = pedidoDto.ProductoID,
+                OpcionPersonalizacion  = opcionesPersonalizacion,
+                CostosExtras = costoExtraTamano + costoExtraTono// Sumatoria de los costos extra de las opciones
+            };
+            _context.Personalizaciones.Add(nuevaPersonalizacion);
+            await _context.SaveChangesAsync(); // Guardar la personalización para generar el PersonalizacionID
 
             // Crear un nuevo pedido
             var nuevoPedido = new Pedido
             {
                 UsuarioId = pedidoDto.UsuarioID,
                 EstadoPedido = "En Carrito",
-                FechaPedido = DateTime.Now,
-                FechaEntregaEstimada = DateTime.Now.AddDays(7)
+                FechaPedido = DateTime.Now
             };
             _context.Pedidos.Add(nuevoPedido);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(); // Guardar el pedido para generar el PedidoID
 
-            // Crear un detalle de pedido
+            // Crear un detalle de pedido asociado al pedido y a la personalización
             var detallePedido = new DetallesPedido
             {
                 PedidoId = nuevoPedido.PedidoId,
                 ProductoId = producto.ProductoId,
                 Cantidad = pedidoDto.Cantidad,
                 PrecioUnitario = producto.PrecioBase,
-                Subtotal = (producto.PrecioBase + personalizacion.CostosExtras) * pedidoDto.Cantidad,
-                PersonalizacionId = personalizacion.PersonalizacionId,
-                Anticipo = (producto.PrecioBase + personalizacion.CostosExtras) * pedidoDto.Cantidad * 0.5m // Ejemplo de anticipo
+                Subtotal = totalCosto,
+                PersonalizacionId = nuevaPersonalizacion.PersonalizacionId, // Asociar la personalización recién creada
+                Anticipo = totalCosto * 0.5m // Ejemplo de anticipo, 50% del total
             };
             _context.DetallesPedidos.Add(detallePedido);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(); // Guardar el detalle del pedido
 
-            return Json(new { success = true, message = "Producto agregado al carrito correctamente." });
+            return Json(new { success = true, message = "Producto y personalización agregados al carrito correctamente." });
         }
+
 
 
     }
