@@ -1,0 +1,241 @@
+﻿@inject IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "Pago";
+
+
+
+    var pedidos = ViewBag.Pedidos as IEnumerable<dynamic>;
+
+    var total = ViewBag.Total;
+
+    var totalAnticipo = ViewBag.TotalAnticipo;
+
+    var UserId = HttpContextAccessor.HttpContext.Session.GetString("UserId");
+
+
+
+    var UserEmail = HttpContextAccessor.HttpContext.Session.GetString("UserEmail");
+
+
+
+    var UserNombre = HttpContextAccessor.HttpContext.Session.GetString("UsuarioName");
+}
+
+<h1 class="text-center my-4 fs-1 fw-bold text-uppercase text-decoration-underline">Pagos</h1>
+
+<!-- Tabla de productos -->
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Personalizaciones</th> <!-- Nueva columna para las personalizaciones -->
+            <th>Cantidad</th>
+            <th>Precio Unitario</th>
+            <th>Subtotal</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (pedidos != null && pedidos.Any())
+
+        {
+
+            foreach (var pedido in pedidos)
+
+            {
+
+                foreach (var detalle in pedido.Detalles)
+
+                {
+                    <tr>
+                        <td>
+                            @detalle.Producto.NombreProducto <br />
+                            <img src="@Url.Action("ObtenerImagenProducto", "DetallesPedidoes", new { productoId = detalle.Producto.ProductoId })"
+                                 alt="@detalle.Producto.NombreProducto" width="75" class="img-thumbnail" /> <!-- Ancho aumentado a 100 -->
+                        </td>
+                        <td>
+                            @if (detalle.Personalizacion != null)
+
+                            {
+                                <p>@detalle.Personalizacion.OpcionPersonalizacion</p>
+                            }
+
+                            else
+
+                            {
+                                <p>Sin personalización</p>
+                            }
+                        </td>
+                        <td>@detalle.Cantidad</td>
+                        <td>@detalle.PrecioUnitario.ToString("C")</td>
+                        <td>
+                            @detalle.Subtotal.ToString("C")
+                        </td>
+                        <td>
+                            <button class="btn btn-danger" onclick="eliminarDelCarrito(@detalle.DetallePedidoId)">Eliminar</button>
+                        </td>
+                    </tr>
+                }
+
+            }
+
+        }
+
+        else
+
+        {
+            <tr>
+                <td colspan="6" class="text-center">No hay productos en el carrito.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Monto y Anticipo -->
+<div class="d-flex justify-content-between">
+    <h3>Total a Pagar: <span id="totalAPagar">@total.ToString("C")</span></h3>
+    <h3>Total Anticipo: <span id="totalAnticipo">@totalAnticipo.ToString("C")</span></h3>
+</div>
+
+<!-- Sección de selección de banco y datos del pago -->
+<div class="mt-5">
+    <h3 class="text-center">Método de Pago</h3>
+    <p class="text-center">Selecciona un banco para realizar tu pago</p>
+
+    <div class="row">
+        <!-- Cuentas bancarias -->
+        <div class="col-12 col-md-6">
+            <div class="form-group">
+                <label for="banco">Banco</label>
+                <select id="banco" class="form-control">
+                    <option value="Agricola">Agrícola</option>
+                    <option value="Promerica">Promérica</option>
+                    <option value="Atlantida">Atlántida</option>
+                </select>
+            </div>
+            <div class="form-group mt-3">
+                <label for="cuenta">Número de Cuenta</label>
+                <select id="cuenta" class="form-control">
+                    <option value="1234567890">1234-5678-9012 (Agrícola)</option>
+                    <option value="0987654321">9876-5432-1098 (Promérica)</option>
+                    <option value="1357924680">1357-9246-8013 (Atlántida)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Datos del pago -->
+        <div class="col-12 col-md-6">
+            <div class="form-group">
+                <label for="monto">Monto a Pagar</label>
+                <input type="text" class="form-control" id="monto" value="@totalAnticipo.ToString("C")" disabled>
+            </div>
+            <div class="form-group">
+                <label for="referencia">Referencia de Pago</label>
+                <input type="text" class="form-control" id="referencia" placeholder="Introduce el código de la transacción">
+            </div>
+        </div>
+    </div>
+
+    <!-- Botón de pago -->
+    <div class="d-flex justify-content-center mt-4">
+        <button class="btn btn-success styleBotonsNav w-100" onclick="confirmarPago()">Confirmar Pago</button>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function eliminarDelCarrito(detallePedidoId) {
+            var elim = {
+                detalle: detallePedidoId
+            };
+            Swal.fire({
+                title: "¿Estás seguro?",
+                text: "¡No podrás recuperar este producto después de eliminarlo!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Eliminar",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("EliminarDelCarrito", "DetallesPedidoes")',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(elim),
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire("¡Eliminado!", "El producto ha sido eliminado de tu carrito.", "success")
+                                    .then(() => {
+                                        location.reload(); // Recargar la página
+                                    });
+                            } else {
+                                Swal.fire("Error", "Error al eliminar el producto: " + response.message, "error");
+                            }
+                        },
+                        error: function () {
+                            Swal.fire("Error", "Error al eliminar el producto.", "error");
+                        }
+                    });
+                } else {
+                    Swal.fire("¡Cancelado!", "El producto sigue en tu carrito.", "info");
+                }
+            });
+        }
+
+        function confirmarPago() {
+            Swal.fire({
+                title: "Confirmar Pago",
+                text: "¿Estás seguro de que deseas proceder con el pago?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Sí, Pagar",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    registrarPago();
+                }
+            });
+        }
+
+        function registrarPago() {
+            var pagoData = {
+                pedidoId: 1022,  // Asigna tu pedidoId aquí
+                monto: @totalAnticipo,  // Asegúrate de que esto sea un valor numérico
+                metodoPago: "Transferencia",
+                nCuenta: $("#cuenta").val(),
+                referencia: $("#referencia").val(),
+                userId: @UserId,  // Asegúrate de que @UserId sea un valor válido
+                userNombre: '@UserNombre',  // Asegúrate de que @UserNombre sea un valor válido
+                userEmail: '@UserEmail'  // Asegúrate de que @UserEmail sea un valor válido
+            };
+
+            $.ajax({
+                url: '@Url.Action("RegistrarPagos", "DetallesPedidoes")',  // Asegúrate de que la URL sea correcta
+                type: 'POST',
+                contentType: 'application/json',  // Necesario para enviar JSON
+                data: JSON.stringify(pagoData),  // Convierte el objeto en una cadena JSON
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            title: "Pago Registrado",
+                            text: "El pago se ha realizado exitosamente, revise su correo electronico para más detalles.",
+                            icon: "success",
+                            confirmButtonText: "OK"
+                        }).then(() => {
+                            window.location.href = '@Url.Action("InicioClient", "Home")';  // Redirige al menú de inicio
+                        });
+                    } else {
+                        Swal.fire("Error", "Error al registrar el pago: " + response.message, "error");
+                    }
+                },
+                error: function () {
+                    Swal.fire("Error", "Hubo un error al procesar el pago.", "error");
+                }
+            });
+        }
+
+
+
+
+    </script>
+}
